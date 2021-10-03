@@ -8,7 +8,7 @@
           "icon": "styles/images/icon.svg"
         },
         "new_ticket_sidebar": {
-          "url": "views/new_tkt_req_info.html",
+          "url": "views/new_tkt_sidebar.html",
           "icon": "styles/images/icon.svg"
         }
       }

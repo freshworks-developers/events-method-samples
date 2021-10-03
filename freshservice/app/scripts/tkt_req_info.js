@@ -1,66 +1,53 @@
-document.onreadystatechange = function () {
-  if (document.readyState === 'interactive') renderApp();
-};
+document.onreadystatechange = pageInteractive;
 
-function renderApp() {
-  app
-    .initialized()
-    .then((_client) => {
-      window['client'] = _client;
-      client.events.on('app.activated', eventsInTktDetailsPage);
-    })
-    .catch(console.error);
+function pageInteractive() {
+  if (document.readyState === 'interactive') render();
+
+  async function render() {
+    let [err, _client] = await to(app.initialized());
+    if (err) console.error(`Unable to get client at runtime\nDetails:${err}`);
+    window['client'] = _client;
+    client.events.on('app.activated', eventsInTktDetailsPage);
+  }
+
+  function eventsInTktDetailsPage() {
+    const spotlight = document.querySelector('.spotlight');
+
+    let clickEvents = [
+      'ticket.replyClick',
+      'ticket.sendReply',
+      'ticket.forwardClick',
+      'ticket.conversationForward',
+      'ticket.forward',
+      'ticket.notesClick',
+      'ticket.addNote',
+      'ticket.closeTicketClick',
+      'ticket.deleteTicketClick',
+      'ticket.previousTicketClick',
+      'ticket.nextTicketClick',
+      'ticket.startTimer',
+      'ticket.stopTimer',
+      'ticket.updateTimer',
+      'ticket.deleteTimer'
+    ];
+
+    clickEvents.forEach(function register(click) {
+      client.events.on(click, function (event) {
+        spotlight.insertAdjacentHTML('afterend', `<fw-label value="${click}" color="green"></fw-label>`);
+      });
+    });
+  }
 }
 
-function eventsInTktDetailsPage() {
-  const spotlight = document.querySelector('.spotlight');
-
-  let clickEvents = [
-    'ticket.replyClick',
-    'ticket.sendReply',
-    'ticket.forwardClick',
-    'ticket.conversationForward',
-    'ticket.forward',
-    'ticket.notesClick',
-    'ticket.addNote',
-    'ticket.closeTicketClick',
-    'ticket.deleteTicketClick',
-    'ticket.previousTicketClick',
-    'ticket.nextTicketClick',
-    'ticket.startTimer',
-    'ticket.stopTimer',
-    'ticket.updateTimer',
-    'ticket.deleteTimer'
-  ];
-
-  let interceptEvents = {
-    prevent: ['ticket.closeTicketClick', 'ticket.deleteTicketClick'],
-    allow: ['ticket.propertiesUpdated', 'ticket.sendReply']
-  };
-
-  clickEvents.forEach(function register(click) {
-    client.events.on(click, function (event) {
-      spotlight.insertAdjacentHTML('afterend', `<fw-label value="${click}" color="green"></fw-label>`);
+function to(promise, opts) {
+  return promise
+    .then(function (data) {
+      return [null, data];
+    })
+    .catch(function (err) {
+      if (opts) {
+        Object.assign(err, opts);
+      }
+      return [err, undefined];
     });
-  });
-
-  interceptEvents['prevent'].forEach(function registerCb(click) {
-    client.events.on(click, preventClickEvent, { intercept: true });
-
-    function preventClickEvent(event) {
-      let eventName = event.type;
-      const row = `<fw-label value="${eventName.slice(7)} prevented" color="red"></fw-label>`;
-      spotlight.insertAdjacentHTML('afterend', row);
-    }
-  });
-
-  interceptEvents['allow'].forEach(function registerCb(click) {
-    client.events.on(click, allowClickEvents);
-
-    function allowClickEvents(event) {
-      let eventName = event.type;
-      const row = `<fw-label value="${eventName.slice(7)} allowed" color="red"></fw-label>`;
-      spotlight.insertAdjacentHTML('afterend', row);
-    }
-  });
 }

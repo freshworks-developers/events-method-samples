@@ -9,7 +9,6 @@ Events method can observe 3 types of events
 
 1. Click Events
 2. Change Events
-3. Intercept Events
 
 ### Screenshots:
 
@@ -33,7 +32,6 @@ Events method can observe 3 types of events
 
 1. Make sure you have [tools required to start building Freshworks Apps](https://community.developers.freshworks.com/t/tools-required-to-start-building-freshworks-apps/3585)
 2. Ensure that you have the [Freshworks CLI](https://community.developers.freshworks.com/t/what-are-the-prerequisites-to-install-the-freshworks-cli/234) installed properly.
-3. Get [Freshdesk API key](https://support.freshdesk.com/support/solutions/articles/215517). After you install the app, you'd notice contacts are being rendered in `ticket_conversation_editor` placeholder.
 
 ### Procedure to run the app:
 
@@ -42,3 +40,7 @@ Events method can observe 3 types of events
 > fdk run
 # app runs on localhost:10001 and sample config page is rendered on /custom_configs
 ```
+
+### Common discussions:
+
+1. Intercept events are not yet support in when Freshservice is hosting your app.
