@@ -1,9 +1,10 @@
-# Events Methods for freshdesk
+# Events Methods for Freshservice
 
 ### Description:
 
-You can observe events that occur in the Freshdesk UI and register a callback with events methods.
-client.events.on("<argument>", callback[,options]) - takes in a callback which will be invoked when desired event occured.
+You can observe events that occur in the Freshservice UI and register a callback with events methods.
+`client.events.on("<argument>", callback[,options])` - takes in a callback which will be invoked when desired event occured.
+
 Events method can observe 3 types of events
 
 1. Click Events
@@ -12,21 +13,25 @@ Events method can observe 3 types of events
 
 ### Screenshots:
 
-#### Click Events
+#### Events in Ticket Details Page
 
-![config page in local development](./screenshots/1.png)
+<article align="center">
 
-### Intercept Events
+![](./screenshots/1.png)
 
-![make secure api calls and get api data](./screenshots/2.png)
+</article>
 
-### Change Events
+### Events in New Incident Create page
 
-![](./screenshots/3.png)
+<article align="center">
+
+![](./screenshots/2.png)
+
+</article>
 
 ### Prerequisites:
 
-1. Make sure you have a trial Freshdesk account created. You can always [sign up](https://freshdesk.com/signup)
+1. Make sure you have [tools required to start building Freshworks Apps](https://community.developers.freshworks.com/t/tools-required-to-start-building-freshworks-apps/3585)
 2. Ensure that you have the [Freshworks CLI](https://community.developers.freshworks.com/t/what-are-the-prerequisites-to-install-the-freshworks-cli/234) installed properly.
 3. Get [Freshdesk API key](https://support.freshdesk.com/support/solutions/articles/215517). After you install the app, you'd notice contacts are being rendered in `ticket_conversation_editor` placeholder.
 

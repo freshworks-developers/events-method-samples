@@ -1,21 +1,21 @@
 {
-  "platform-version": "2.0",
+  "platform-version": "2.2",
   "product": {
-    "freshdesk": {
+    "freshservice": {
       "location": {
-        "cti_global_sidebar": {
-          "url": "views/cti.html",
-          "icon": "styles/images/icon.svg"
-        },
         "ticket_requester_info": {
           "url": "views/tkt_req_info.html",
           "icon": "styles/images/icon.svg"
         },
-        "new_ticket_requester_info": {
+        "new_ticket_sidebar": {
           "url": "views/new_tkt_req_info.html",
           "icon": "styles/images/icon.svg"
         }
       }
     }
+  },
+  "engines": {
+    "node": "12.22.6",
+    "fdk": "7.0.1"
   }
 }
