@@ -33,7 +33,10 @@ function pageInteractive() {
 
     clickEvents.forEach(function register(click) {
       client.events.on(click, function (event) {
-        spotlight.insertAdjacentHTML('afterend', `<fw-label value="${click}" color="green"></fw-label>`);
+        var event_data = event.helper.getData();
+        const row = `<fw-label value="${click}" color="green"></fw-label>`;
+        spotlight.insertAdjacentHTML('afterend', row);
+        console.log("event data = " + event_data);
       });
     });
   }
