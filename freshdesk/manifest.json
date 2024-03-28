@@ -1,12 +1,16 @@
 {
-  "platform-version": "2.0",
-  "product": {
-    "freshdesk": {
+  "platform-version": "3.0",
+  "modules": {
+    "common": {
       "location": {
         "cti_global_sidebar": {
           "url": "views/cti.html",
           "icon": "styles/images/icon.svg"
-        },
+        }
+      }
+    },
+    "support_ticket": {
+      "location": {
         "ticket_requester_info": {
           "url": "views/tkt_req_info.html",
           "icon": "styles/images/icon.svg"
@@ -17,5 +21,9 @@
         }
       }
     }
+  },
+  "engines": {
+    "node": "18.16.1",
+    "fdk": "9.1.0"
   }
 }
