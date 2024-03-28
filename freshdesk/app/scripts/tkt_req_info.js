@@ -46,7 +46,6 @@ function eventsInTktDetailsPage() {
 
   interceptEvents['prevent'].forEach(function registerCb(click) {
     client.events.on(click, preventClickEvent, { intercept: true });
-
     function preventClickEvent(event) {
       let eventName = event.type;
       const row = `<fw-label value="${eventName.slice(7)} prevented" color="red"></fw-label>`;
