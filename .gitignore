@@ -132,3 +132,5 @@ dist
 .fdk
 .report.json
 log/
+
+.DS_Store
