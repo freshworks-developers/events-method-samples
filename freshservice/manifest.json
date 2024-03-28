@@ -1,7 +1,7 @@
 {
-  "platform-version": "2.3",
-  "product": {
-    "freshservice": {
+  "platform-version": "3.0",
+  "modules": {
+    "service_ticket": {
       "location": {
         "ticket_requester_info": {
           "url": "views/tkt_req_info.html",
@@ -15,7 +15,7 @@
     }
   },
   "engines": {
-    "node": "18.15.0",
-    "fdk": "9.0.0"
+    "node": "18.16.1",
+    "fdk": "9.1.0"
   }
 }

@@ -39,11 +39,8 @@ function eventsInTktDetailsPage() {
   };
 
   clickEvents.forEach(function register(click) {
-    client.events.on(click, function (event) {
-      var event_data = event.helper.getData();
-      const row = `<fw-label value="${click}" color="green"></fw-label>`;
-      spotlight.insertAdjacentHTML('afterend', row);
-      console.log("event data = " + event_data);
+    client.events.on(click, function () {
+      spotlight.insertAdjacentHTML('afterend', `<fw-label value="${click}" color="green"></fw-label>`);
     });
   });
 
