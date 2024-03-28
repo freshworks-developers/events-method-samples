@@ -32,7 +32,7 @@ function pageInteractive() {
     ];
 
     clickEvents.forEach(function register(click) {
-      client.events.on(click, function (event) {
+      client.events.on(click, function () {
         spotlight.insertAdjacentHTML('afterend', `<fw-label value="${click}" color="green"></fw-label>`);
       });
     });
