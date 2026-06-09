@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinSecure Compliance</title>
+    <script async src="{{{appclient}}}"></script>
+    <link rel="stylesheet" href="../styles/ticket-sidebar.css" />
+  </head>
+  <body>
+    <div class="fs-app dashboard">
+      <header class="fs-header">
+        <div class="fs-header__mark">
+          <fw-icon name="shield" size="16" color="#2C5CC5"></fw-icon>
+        </div>
+        <div class="fs-header__text">
+          <span class="fs-header__brand">FinSecure</span>
+          <span class="fs-header__title">Ticket compliance</span>
+          <span id="ticket-meta" class="fs-header__meta">Loading…</span>
+        </div>
+        <fw-label id="status-pill" class="fs-header__badge" value="Protected" color="green"></fw-label>
+      </header>
+
+      <div class="fs-body dashboard__body">
+        <div id="getting-started" class="getting-started panel">
+          <p class="getting-started__title">Getting started</p>
+          <ol class="getting-started__steps">
+            <li>Confirm <strong>fdk run</strong> is running and this page URL has <strong>?dev=true</strong></li>
+            <li>On Freshservice, click the <strong>FinSecure shield icon</strong> in the right sidebar app list</li>
+            <li>Try an action: open <strong>Reply</strong>, add a <strong>Note</strong>, or change <strong>Priority</strong></li>
+            <li>Events appear below automatically (refreshes every few seconds)</li>
+          </ol>
+        </div>
+
+        <section class="dashboard__guardrails panel">
+          <div class="panel__head">
+            <h2>Guardrails</h2>
+            <p>Blocks close and delete while enabled. Runs in the background even when this panel is closed.</p>
+          </div>
+          <div class="guardrails-toggle fs-row">
+            <div>
+              <p class="fs-row__label">Protect close &amp; delete</p>
+              <p class="fs-row__hint">Supervisor approval required to disable.</p>
+            </div>
+            <fw-toggle id="guardrails-toggle" checked></fw-toggle>
+          </div>
+        </section>
+
+        <section class="dashboard__log panel">
+          <div class="panel__head fs-toolbar">
+            <div>
+              <h2>Action log</h2>
+              <p>Captured automatically on this ticket.</p>
+            </div>
+            <div class="panel__actions">
+              <fw-button id="refresh-log" color="secondary" size="small">Refresh</fw-button>
+              <fw-button id="clear-log" color="text" size="small">Clear</fw-button>
+            </div>
+          </div>
+          <ul id="audit-log" class="fs-list fs-list--tall" aria-live="polite"></ul>
+          <p id="empty-audit" class="fs-empty">Actions on this ticket appear here — replies, notes, field changes, timers.</p>
+        </section>
+
+        <section class="dashboard__blocked panel">
+          <div class="panel__head">
+            <h2>Blocked attempts</h2>
+            <p>Close or delete actions stopped by guardrails.</p>
+          </div>
+          <ul id="blocked-list" class="fs-list"></ul>
+          <p id="empty-blocked" class="fs-empty">No blocked attempts on this ticket.</p>
+        </section>
+      </div>
+    </div>
+
+    <script async type="module" src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.esm.js"></script>
+    <script async nomodule src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"></script>
+    <script src="../scripts/lib/compliance-store.js"></script>
+    <script defer src="../scripts/ticket-sidebar.js"></script>
+  </body>
+</html>

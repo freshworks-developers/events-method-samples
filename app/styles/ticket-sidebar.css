@@ -1,0 +1,96 @@
+@import url('common.css');
+
+.dashboard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 620px;
+}
+
+.getting-started {
+  padding: 12px 14px;
+  background: #f8fbff;
+  border-color: #c5d9f8;
+}
+
+.getting-started__title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.getting-started__steps {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #475867;
+  line-height: 1.55;
+}
+
+.getting-started__steps li + li {
+  margin-top: 6px;
+}
+
+.panel {
+  border: 1px solid #ebeff3;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.panel__head {
+  padding: 12px 14px 0;
+}
+
+.panel__head h2 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.panel__head p {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #6b7c93;
+  line-height: 1.45;
+}
+
+.panel__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.guardrails-toggle {
+  margin: 0 14px 14px;
+  padding: 12px 14px;
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  background: #fafbfc;
+}
+
+.dashboard__log .fs-list,
+.dashboard__blocked .fs-list {
+  margin: 0 14px 14px;
+}
+
+.fs-list--tall {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.dashboard__blocked .fs-list:not(:empty) + .fs-empty {
+  display: none;
+}
+
+.dashboard__log .fs-list:not(:empty) + .fs-empty {
+  display: none;
+}
+
+.dashboard__blocked .fs-list:empty + .fs-empty,
+.dashboard__log .fs-list:empty + .fs-empty {
+  display: block;
+  margin: 0 14px 14px;
+}

@@ -1,0 +1,54 @@
+@import url('common.css');
+
+.dialer-display {
+  text-align: center;
+  padding: 16px 12px;
+}
+
+.dialer-display__label {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7c93;
+}
+
+.dialer-display__number {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #12344d;
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.dialer-display--active .dialer-display__number {
+  color: #2c5cc5;
+}
+
+.cti-steps {
+  padding: 12px 14px;
+  background: #f8fbff;
+  border: 1px solid #c5d9f8;
+  border-radius: 4px;
+}
+
+.cti-steps__title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.cti-steps__list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #475867;
+  line-height: 1.55;
+}
+
+.cti-steps__list li + li {
+  margin-top: 6px;
+}

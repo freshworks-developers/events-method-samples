@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinSecure Compliance</title>
+    <script async src="{{{appclient}}}"></script>
+    <link rel="stylesheet" href="../styles/new-ticket.css" />
+  </head>
+  <body>
+    <div class="fs-app">
+      <header class="fs-header">
+        <div class="fs-header__mark" aria-hidden="true">
+          <fw-icon name="shield" size="16" color="#2C5CC5"></fw-icon>
+        </div>
+        <div class="fs-header__text">
+          <span class="fs-header__brand">FinSecure</span>
+          <span class="fs-header__title">Change tracker</span>
+          <span class="fs-header__meta">SOX audit log for new tickets</span>
+        </div>
+        <fw-label value="Logging" color="blue"></fw-label>
+      </header>
+
+      <div class="fs-body fs-stack">
+        <div id="coaching-banner" hidden>
+          <fw-inline-message id="coaching-message" type="warning" closable="true">
+            Group assignment may not match HR policy. Verify queue before submitting.
+          </fw-inline-message>
+        </div>
+
+        <div class="change-table-wrap">
+          <table class="change-table">
+            <thead>
+              <tr>
+                <th>Previous</th>
+                <th>Current</th>
+                <th>Field</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="change-log">
+              <tr class="empty-row" id="empty-row">
+                <td colspan="4">Change priority, status, group, or assignee to start logging.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script async type="module" src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.esm.js"></script>
+    <script async nomodule src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"></script>
+    <script defer src="../scripts/new-ticket.js"></script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+{
+  "platform-version": "3.0",
+  "modules": {
+    "common": {
+      "location": {
+        "full_page_app": {
+          "url": "views/compliance-center.html",
+          "icon": "styles/images/icon.svg"
+        },
+        "cti_global_sidebar": {
+          "url": "views/cti.html",
+          "icon": "styles/images/icon.svg"
+        }
+      }
+    },
+    "support_ticket": {
+      "location": {
+        "ticket_background": {
+          "url": "views/background.html",
+          "icon": "styles/images/icon.svg"
+        },
+        "ticket_sidebar": {
+          "url": "views/ticket-sidebar.html",
+          "icon": "styles/images/icon.svg"
+        },
+        "new_ticket_requester_info": {
+          "url": "views/new-ticket.html",
+          "icon": "styles/images/icon.svg"
+        }
+      }
+    },
+    "service_ticket": {
+      "location": {
+        "ticket_background": {
+          "url": "views/background.html",
+          "icon": "styles/images/icon.svg"
+        },
+        "ticket_sidebar": {
+          "url": "views/ticket-sidebar.html",
+          "icon": "styles/images/icon.svg"
+        },
+        "new_ticket_sidebar": {
+          "url": "views/new-ticket.html",
+          "icon": "styles/images/icon.svg"
+        }
+      }
+    }
+  },
+  "engines": {
+    "node": "24.11.0",
+    "fdk": "10.1.2"
+  }
+}

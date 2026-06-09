@@ -1,0 +1,50 @@
+@import url('common.css');
+
+.change-table-wrap {
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.change-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.change-table th,
+.change-table td {
+  padding: 7px 10px;
+  text-align: left;
+  border-bottom: 1px solid #ebeff3;
+}
+
+.change-table th {
+  background: #fafbfc;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #6b7c93;
+}
+
+.change-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.change-table .prev {
+  color: #6b7c93;
+}
+
+.change-table .current {
+  color: #12344d;
+  font-weight: 600;
+}
+
+.empty-row td {
+  text-align: center;
+  color: #6b7c93;
+  font-size: 12px;
+  padding: 20px 12px;
+  background: #fafbfc;
+}

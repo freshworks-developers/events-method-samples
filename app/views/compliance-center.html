@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinSecure Compliance Center</title>
+    <script async src="{{{appclient}}}"></script>
+    <link rel="stylesheet" href="../styles/compliance-center.css" />
+  </head>
+  <body>
+    <div class="center">
+      <header class="center__hero">
+        <div class="center__hero-mark">
+          <fw-icon name="shield" size="24" color="#2C5CC5"></fw-icon>
+        </div>
+        <div>
+          <h1>FinSecure Compliance Center</h1>
+          <p>Review audit activity across tickets. Per-ticket capture runs in the background on every ticket you open.</p>
+        </div>
+      </header>
+
+      <div class="center__grid">
+        <section class="panel panel--wide">
+          <div class="panel__head fs-toolbar">
+            <div>
+              <h2>Tickets with activity</h2>
+              <p>Select a ticket to review its full audit log.</p>
+            </div>
+            <fw-button id="refresh-index" color="secondary" size="small">Refresh</fw-button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Events</th>
+                  <th>Blocked</th>
+                  <th>Last activity</th>
+                </tr>
+              </thead>
+              <tbody id="ticket-index">
+                <tr class="empty-row">
+                  <td colspan="4">Open tickets and perform actions — activity will appear here.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel__head">
+            <h2 id="detail-title">Audit detail</h2>
+            <p id="detail-subtitle">Select a ticket from the list.</p>
+          </div>
+          <ul id="detail-log" class="fs-list fs-list--tall"></ul>
+          <p id="detail-empty" class="fs-empty">No ticket selected.</p>
+        </section>
+
+        <section class="panel panel--map">
+          <div class="panel__head">
+            <h2>Where each feature lives</h2>
+            <p>FinSecure uses the right Freshworks surface for each job — nothing is duplicated in a tiny sidebar.</p>
+          </div>
+          <ul class="feature-map">
+            <li>
+              <strong>Ticket background</strong>
+              <span>Always-on capture and guardrails on ticket pages (invisible).</span>
+            </li>
+            <li>
+              <strong>Ticket sidebar</strong>
+              <span>Per-ticket dashboard — guardrails toggle, action log, blocked attempts.</span>
+            </li>
+            <li>
+              <strong>Compliance Center</strong>
+              <span>This full-page view — cross-ticket audit review.</span>
+            </li>
+            <li>
+              <strong>New ticket sidebar</strong>
+              <span>SOX change tracker while creating a ticket.</span>
+            </li>
+            <li>
+              <strong>CTI dialer (Freshdesk)</strong>
+              <span>Click-to-dial only — phone events fire in the CTI bar, not on ticket pages.</span>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <script async type="module" src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.esm.js"></script>
+    <script async nomodule src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"></script>
+    <script src="../scripts/lib/compliance-store.js"></script>
+    <script defer src="../scripts/compliance-center.js"></script>
+  </body>
+</html>

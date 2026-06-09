@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinSecure Dialer</title>
+    <script async src="{{{appclient}}}"></script>
+    <link rel="stylesheet" href="../styles/cti.css" />
+  </head>
+  <body>
+    <div class="fs-app">
+      <header class="fs-header">
+        <div class="fs-header__mark" aria-hidden="true">
+          <fw-icon name="phone" size="16" color="#2C5CC5"></fw-icon>
+        </div>
+        <div class="fs-header__text">
+          <span class="fs-header__brand">FinSecure</span>
+          <span class="fs-header__title">Dialer</span>
+          <span class="fs-header__meta">Freshdesk CTI bar (bottom-left)</span>
+        </div>
+        <fw-label id="dialer-status" class="fs-header__badge" value="Idle" color="grey"></fw-label>
+      </header>
+
+      <div class="fs-body fs-stack">
+        <div class="cti-steps panel">
+          <p class="cti-steps__title">How to open and use this app</p>
+          <ol class="cti-steps__list">
+            <li>Run <strong>fdk run</strong> and open Freshdesk with <strong>?dev=true</strong></li>
+            <li>Look at the <strong>bottom-left corner</strong> of Freshdesk for the phone / app icon</li>
+            <li><strong>Click that icon</strong> to expand the CTI panel (400×400px widget)</li>
+            <li>On any ticket, click a <strong>phone number</strong> or <strong>call icon</strong> in Contact details</li>
+            <li>The number appears below — this is separate from the ticket sidebar app</li>
+          </ol>
+        </div>
+
+        <div id="dialer-card" class="fs-card dialer-display">
+          <p class="dialer-display__label">Number to dial</p>
+          <p id="phone-number" class="dialer-display__number">—</p>
+        </div>
+
+        <fw-button id="clear-dialer" color="secondary" size="small">Clear number</fw-button>
+      </div>
+    </div>
+
+    <script async type="module" src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.esm.js"></script>
+    <script async nomodule src="https://cdn.jsdelivr.net/npm/@freshworks/crayons@v4/dist/crayons/crayons.js"></script>
+    <script defer src="../scripts/cti.js"></script>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+@import url('common.css');
+
+html,
+body {
+  height: 100%;
+  background: #f5f7f9;
+}
+
+.center {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+}
+
+.center__hero {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid #ebeff3;
+  border-radius: 8px;
+}
+
+.center__hero-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #eef4ff;
+  flex-shrink: 0;
+}
+
+.center__hero h1 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.center__hero p {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7c93;
+  line-height: 1.5;
+  max-width: 640px;
+}
+
+.center__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.panel--wide {
+  grid-column: 1 / -1;
+}
+
+.panel--map {
+  grid-column: 1 / -1;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #ebeff3;
+  border-radius: 8px;
+  padding: 0 0 14px;
+}
+
+.panel__head {
+  padding: 14px 16px 0;
+}
+
+.panel__head h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.panel__head p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #6b7c93;
+}
+
+.table-wrap {
+  margin: 0 16px;
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ebeff3;
+}
+
+.data-table th {
+  background: #fafbfc;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7c93;
+}
+
+.data-table tbody tr {
+  cursor: pointer;
+}
+
+.data-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.data-table tbody tr.is-selected {
+  background: #eef4ff;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-row td {
+  text-align: center;
+  color: #6b7c93;
+  cursor: default;
+  padding: 24px;
+}
+
+#detail-log {
+  margin: 0 16px;
+}
+
+#detail-log:not(:empty) + #detail-empty {
+  display: none;
+}
+
+#detail-empty {
+  margin: 0 16px;
+}
+
+.feature-map {
+  margin: 0 16px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.feature-map li {
+  padding: 12px;
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  background: #fafbfc;
+}
+
+.feature-map strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: #12344d;
+}
+
+.feature-map span {
+  font-size: 12px;
+  color: #6b7c93;
+  line-height: 1.45;
+}

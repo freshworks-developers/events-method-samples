@@ -1,0 +1,257 @@
+/* FinSecure — shared layout (all surfaces) */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #12344d;
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fs-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.fs-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ebeff3;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.fs-header__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #eef4ff;
+  flex-shrink: 0;
+}
+
+.fs-header__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.fs-header__brand {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2c5cc5;
+  line-height: 1.2;
+}
+
+.fs-header__title {
+  display: block;
+  margin: 1px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #12344d;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-header__meta {
+  display: block;
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #6b7c93;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-header__badge {
+  flex-shrink: 0;
+}
+
+.fs-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+}
+
+.fs-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fs-body::-webkit-scrollbar-thumb {
+  background: #d0d6dd;
+  border-radius: 3px;
+}
+
+.fs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.fs-muted {
+  font-size: 11px;
+  color: #6b7c93;
+  font-weight: 500;
+}
+
+.fs-section-label {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7c93;
+}
+
+.fs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fs-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  border-bottom: 1px solid #ebeff3;
+}
+
+.fs-list__item:last-child {
+  border-bottom: none;
+}
+
+.fs-list__item--blocked {
+  background: #fff8f8;
+}
+
+.fs-list__dot {
+  width: 6px;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #2c5cc5;
+  flex-shrink: 0;
+}
+
+.fs-list__item--blocked .fs-list__dot {
+  background: #d72d30;
+}
+
+.fs-list__item--change .fs-list__dot {
+  background: #f5a623;
+}
+
+.fs-list__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.fs-list__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: #12344d;
+}
+
+.fs-list__time {
+  margin: 0;
+  font-size: 11px;
+  color: #6b7c93;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.fs-empty {
+  padding: 20px 12px;
+  text-align: center;
+  color: #6b7c93;
+  font-size: 12px;
+  line-height: 1.5;
+  border: 1px dashed #d0d6dd;
+  border-radius: 4px;
+  background: #fafbfc;
+}
+
+.fs-empty[hidden] {
+  display: none;
+}
+
+.fs-card {
+  padding: 12px;
+  border: 1px solid #ebeff3;
+  border-radius: 4px;
+  background: #fafbfc;
+}
+
+.fs-card--active {
+  border-color: #2c5cc5;
+  background: #f8fbff;
+}
+
+.fs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.fs-row__label {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.fs-row__hint {
+  margin: 0;
+  font-size: 11px;
+  color: #6b7c93;
+}
+
+fw-tabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+fw-tab-panel {
+  padding-top: 8px;
+}
