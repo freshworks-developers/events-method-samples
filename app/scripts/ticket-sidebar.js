@@ -25,8 +25,17 @@
 
   async function onSidebarReady() {
     await resizeSidebar();
+    await ensureCapture();
     await refresh();
     startPolling();
+  }
+
+  async function ensureCapture() {
+    try {
+      await FinSecureEvents.registerTicketDetailEvents(state.client, FinSecureStore);
+    } catch (error) {
+      console.info('Could not ensure capture listeners', error);
+    }
   }
 
   async function resizeSidebar() {

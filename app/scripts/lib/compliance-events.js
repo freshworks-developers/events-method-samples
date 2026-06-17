@@ -80,10 +80,16 @@ window.FinSecureEvents = (function () {
     return String(value);
   }
 
-  function registerTicketDetailEvents(client, store) {
+  async function registerTicketDetailEvents(client, store) {
     if (registered) {
       return;
     }
+
+    const acquired = await store.acquireEventRegistration(client);
+    if (!acquired) {
+      return;
+    }
+
     registered = true;
 
     CLICK_EVENTS.forEach((eventName) => {

@@ -1,183 +1,232 @@
-# FinSecure Compliance
+<p align="center">
+  <img src="event-methods.png" alt="event methods app" width="100%" />
+</p>
 
-Real-time compliance for regulated support teams on **Freshdesk** and **Freshservice**. FinSecure captures agent actions, blocks destructive ticket operations, logs field changes, and integrates Freshdesk click-to-dial — each feature runs on the Freshworks surface where the platform actually fires those events.
+# Events Method Samples — FinSecure Compliance
 
----
+A Freshworks Platform 3.0 sample app that demonstrates **Events Methods** for regulated support teams — click, change, and intercept listeners plus CTI dialer integration — with audit logging persisted to **`client.db`**.
 
-## Why the app is split across surfaces
+## Description
 
-Freshworks only exposes certain events on certain pages. FinSecure maps each capability to the right placeholder instead of cramming everything into a narrow requester-info strip.
+FinSecure Bank must capture agent actions on tickets, block destructive operations, log field changes for SOX reporting, and integrate click-to-dial — each on the Freshworks surface where the platform actually fires those events. This app maps capabilities to the correct placeholder instead of cramming everything into one narrow sidebar. See [`usecase.md`](usecase.md) for the full FinSecure operational scenarios.
 
-| Surface | Product | What it does | Why it exists |
-|---------|---------|--------------|---------------|
-| **Ticket background** | Freshdesk, Freshservice | Invisible listener on every ticket page — captures clicks, field changes, and enforces guardrails | Events fire while agents work even if no UI is open |
-| **Ticket sidebar** | Freshdesk, Freshservice | Per-ticket dashboard — guardrails toggle, readable action log, blocked attempts | Wide panel with room to review one ticket |
-| **Compliance Center** | Freshdesk, Freshservice | Full-page cross-ticket audit review | Supervisors browse activity across tickets |
-| **New ticket sidebar** | Freshdesk, Freshservice | SOX change tracker while creating a ticket | Change events only fire on the new-ticket page |
-| **CTI dialer** | Freshdesk only | Click-to-dial number display | `cti.triggerDialer` only fires in the CTI global sidebar — not on ticket pages |
+### Core Functionality
 
-### Why is there a dialer?
-
-The dialer is **not** part of ticket compliance. Contact-center agents use Freshdesk’s **CTI bar** (bottom-left phone widget). When they click a phone number anywhere in Freshdesk, the platform emits `cti.triggerDialer` **only** to apps in `cti_global_sidebar`. That event cannot be received from the ticket sidebar or full page — so the dialer is a separate, intentional surface for telephony integration.
-
----
+1. **Always-on capture (`ticket_background`)** — silent click, change, and intercept listeners on every ticket page.
+2. **Per-ticket dashboard (`ticket_sidebar`)** — guardrails toggle, action log, blocked attempts.
+3. **Compliance Center (`full_page_app`)** — cross-ticket audit review for supervisors.
+4. **New-ticket tracker** — SOX change log and HR routing coaching on the new-ticket page.
+5. **CTI dialer (`cti_global_sidebar`)** — displays E.164 numbers from `cti.triggerDialer` (Freshdesk only).
 
 ## Features
 
-### Always-on capture (ticket background)
+- **14 click events** — reply, forward, note, timer, navigation, and properties actions logged per ticket.
+- **5 change events** — priority, status, group, assignee, and type with `{ old, new }` from `event.helper.getData()`.
+- **Intercept guardrails** — `ticket.closeTicketClick` and `ticket.deleteTicketClick` blocked when protection is on.
+- **Shared `client.db` store** — background writes logs; sidebar and full-page read the same keys.
+- **3-second sidebar polling** — action log refreshes while the compliance panel is open.
+- **HR coaching banner** — new-ticket surface warns when group is not an approved HR queue.
+- **Dev fallback** — in-memory store when `client.db` returns status `0` during local `fdk run`.
 
-Runs silently on every ticket you open:
+## User Interfaces
 
-- Logs replies, forwards, notes, timers, navigation, and property updates
-- Logs priority, status, group, assignee, and type changes on the ticket details page
-- Blocks close and delete when guardrails are enabled
-- Persists everything to the platform key-value store per ticket ID
+| Surface | Placement | Behavior |
+| --- | --- | --- |
+| `app/views/background.html` | `support_ticket.ticket_background`, `service_ticket.ticket_background` | Invisible listener — capture + guardrails → `client.db` |
+| `app/views/ticket-sidebar.html` | `ticket_sidebar` (Freshdesk + Freshservice) | Guardrails toggle, per-ticket action log, blocked tab |
+| `app/views/compliance-center.html` | `common.full_page_app` | Cross-ticket audit table and detail view |
+| `app/views/new-ticket.html` | `support_ticket.new_ticket_requester_info`, `service_ticket.new_ticket_sidebar` | Priority/status/group/assignee/type change tracker |
+| `app/views/cti.html` | `common.cti_global_sidebar` | Click-to-dial number display (Freshdesk only) |
 
-You do not need to keep the sidebar open for capture to work.
+Capture runs even when the sidebar is closed because `ticket_background` registers listeners on every ticket activation.
 
-### Ticket sidebar — per-ticket dashboard
+## Platform 3.0 Features Used
 
-Open **FinSecure Compliance** in the ticket sidebar (wider than the old requester-info slot):
+### 1. Click Events — Agent Action Audit
 
-- **Guardrails** — toggle protect close & delete (synced with background enforcement)
-- **Action log** — full-height scrollable list with timestamps
-- **Blocked attempts** — every stopped close/delete on this ticket
-- **Refresh** — pull latest entries from storage
+Registered in `app/scripts/lib/compliance-events.js` from `ticket_background`:
 
-### Compliance Center — full page
-
-Open from the **Apps** menu in the left navigation:
-
-- Table of all tickets with captured activity
-- Click a ticket to read its complete audit log
-- Feature map explaining where each capability lives
-
-### New ticket change tracker
-
-On the new-ticket page sidebar:
-
-- Logs priority, status, group, assignee, and type changes with previous → current values
-- HR queue coaching when group assignment may not match policy
-
-### CTI dialer (Freshdesk)
-
-In the CTI global sidebar:
-
-- Shows the E.164 number when an agent clicks a phone number or call icon
-- Clear control to reset between calls
-
----
-
-## Architecture
-
-```
-Ticket page (always running)
-  └── ticket_background     → capture + guardrails → client.db
-
-Ticket page (agent opens sidebar)
-  └── ticket_sidebar        → read/write db, guardrails toggle, logs
-
-Apps menu (full page)
-  └── full_page_app         → Compliance Center, cross-ticket index
-
-New ticket page
-  └── new_ticket_* sidebar  → change-event tracker
-
-Freshdesk CTI bar
-  └── cti_global_sidebar    → click-to-dial only
+```javascript
+client.events.on('ticket.replyClick', handler);
+client.events.on('ticket.sendReply', handler);
+client.events.on('ticket.addNote', handler);
+client.events.on('ticket.startTimer', handler);
+// … 14 click events total
 ```
 
-### How every feature stays active
+Each handler resolves the ticket id via `client.data.get('ticket')` and appends a labeled entry to `client.db`.
 
-| Feature | Ensured by |
-|---------|------------|
-| Action audit log | `ticket_background` registers click + change listeners on every ticket activation |
-| Guardrails | `ticket_background` intercept handlers read guardrails setting from `client.db` |
-| Per-ticket review | `ticket_sidebar` reads the same `client.db` keys for the open ticket |
-| Cross-ticket review | `compliance-center` reads the ticket index + per-ticket logs from `client.db` |
-| New-ticket SOX log | Dedicated `new-ticket.html` on new-ticket placeholders only |
-| Click-to-dial | Dedicated `cti.html` on `cti_global_sidebar` only |
+### 2. Change Events — Field-Level SOX Logging
 
----
+```javascript
+client.events.on('ticket.priorityChanged', handler);
+// event.helper.getData() → { old, new }
+```
 
-## Setup
+Change handlers format `old → new` for priority, status, group, assignee, and type. The new-ticket surface renders the same events in a live table for agents creating tickets.
 
-```sh
-git clone https://github.com/freshworks-developers/events-method-samples.git
-cd events-method-samples
+### 3. Intercept Events — Close and Delete Guardrails
+
+```javascript
+client.events.on('ticket.closeTicketClick', handler, { intercept: true });
+client.events.on('ticket.deleteTicketClick', handler, { intercept: true });
+```
+
+When guardrails are enabled (default **on**), close and delete are blocked, logged under the **Blocked** tab, and surfaced via `client.interface.trigger('showNotify', …)`.
+
+### 4. CTI Events — Click-to-Dial (Freshdesk Only)
+
+```javascript
+client.events.on('cti.triggerDialer', handler);
+// event.helper.getData().number — E.164 phone number
+```
+
+`cti.triggerDialer` only fires in `cti_global_sidebar`. It cannot be received from the ticket sidebar or background placement.
+
+### 5. App Lifecycle Events
+
+| Event | Where used | Purpose |
+| --- | --- | --- |
+| `app.activated` | Sidebar, full page, CTI, new ticket | Resize instance, load stored data, register one-time listeners |
+| `ticket.updated` | Ticket sidebar | Refresh audit log after ticket changes |
+| `ticket.propertiesLoaded` | Ticket sidebar | Refresh log when properties panel loads |
+
+### 6. Key-Value Storage — Audit Persistence
+
+`app/scripts/lib/compliance-store.js` writes to `client.db`:
+
+| Key pattern | Contents |
+| --- | --- |
+| `settings:guardrails` | `'true'` / `'false'` — global close/delete protection |
+| `ticket:{id}:log` | Up to 200 audit entries per ticket |
+| `ticket:{id}:blocked` | Up to 50 blocked-action entries |
+| `audit:ticket-index` | Up to 100 tickets with event/blocked counts for Compliance Center |
+
+### 7. Crayons UI Components
+
+| Component | Usage |
+| --- | --- |
+| `<fw-button>` | Refresh log, clear log, clear dialer |
+| `<fw-tabs>` | Action log / Blocked tabs in ticket sidebar |
+| `<fw-toggle>` | Guardrails on/off |
+| `<fw-label>` | Protected status pill, dialer status, timestamps |
+| `<fw-icon>` | FinSecure shield branding in sidebar header |
+
+Sidebar height expands to **700px** via `client.instance.resize`. CTI surface resizes to **400×400px**.
+
+## Project Structure
+
+```
+├── app/
+│   ├── views/
+│   │   ├── background.html           # ticket_background — no visible UI
+│   │   ├── ticket-sidebar.html       # Per-ticket compliance dashboard
+│   │   ├── compliance-center.html    # Full-page supervisor audit view
+│   │   ├── new-ticket.html           # New-ticket change tracker + HR coaching
+│   │   └── cti.html                  # CTI dialer number display
+│   ├── scripts/
+│   │   ├── lib/
+│   │   │   ├── compliance-events.js  # Event registration (click/change/intercept)
+│   │   │   └── compliance-store.js   # client.db persistence + dev memory fallback
+│   │   ├── background.js             # Boots background listeners on init
+│   │   ├── ticket-sidebar.js         # Guardrails UI, log render, polling
+│   │   ├── compliance-center.js      # Ticket index table + detail drill-down
+│   │   ├── new-ticket.js             # Change-event table on new-ticket surfaces
+│   │   └── cti.js                    # cti.triggerDialer handler
+│   └── styles/
+│       ├── common.css
+│       ├── ticket-sidebar.css
+│       ├── compliance-center.css
+│       ├── new-ticket.css
+│       ├── cti.css
+│       └── images/icon.svg
+├── config/
+│   └── iparams.json                  # Empty — no install params required
+├── manifest.json                     # support_ticket + service_ticket + common
+├── usecase.md
+└── README.md
+```
+
+## Prerequisites
+
+- [Freshworks CLI (FDK)](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/basic-dev-tools/freshworks-cli/) v10.1.2 or later
+- Node.js v24.x
+- Freshdesk and/or Freshservice trial accounts
+
+Enable global apps before local development:
+
+```bash
+fdk config set global_apps.enabled true
+```
+
+## Local Development
+
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   cd events-method-samples
+   ```
+
+2. Validate and run:
+   ```bash
+   fdk validate
+   fdk run
+   ```
+
+3. Open Freshdesk or Freshservice with `?dev=true`:
+
+   | Test | Where |
+   | --- | --- |
+   | Ticket capture + sidebar | Open a ticket → **FinSecure Compliance** in right sidebar |
+   | Compliance Center | Apps menu (left nav) → full-page app |
+   | New-ticket tracker | New ticket page → requester info (FD) or sidebar (FS) |
+   | CTI dialer (Freshdesk only) | Bottom-left phone icon → click a number on a ticket |
+
+4. Trigger sample events on a ticket:
+   - Open **Reply** or **Add note** → click event logged
+   - Change **Priority** or **Status** → change event with old/new values
+   - Attempt **Close** or **Delete** with guardrails on → blocked + notify toast
+
+## Implementation Steps
+
+1. **Background registration** — `background.js` calls `FinSecureEvents.registerTicketDetailEvents(client, FinSecureStore)` once per ticket page load.
+2. **Log append** — each handler writes `{ title, variant, event, time }` to `ticket:{id}:log` and updates `audit:ticket-index`.
+3. **Sidebar review** — `ticket-sidebar.js` polls `client.db` every 3s and renders Action log / Blocked tabs.
+4. **Guardrails toggle** — `fw-toggle` writes `settings:guardrails`; intercept handlers read it before allowing close/delete.
+5. **Supervisor view** — Compliance Center reads the ticket index and drills into per-ticket logs on row click.
+6. **CTI surface** — `cti.js` listens only on `cti_global_sidebar` for `cti.triggerDialer`.
+
+## Testing
+
+```bash
+fdk validate
+```
+
+Manual smoke test checklist:
+
+1. Open a ticket with `?dev=true` — perform reply/note/change actions — verify sidebar log updates.
+2. Toggle guardrails off — close/delete should proceed; toggle on — attempts appear under **Blocked**.
+3. Open Compliance Center — ticket index lists captured activity.
+4. On Freshdesk, open CTI bar and click a ticket phone number — dialer panel shows E.164 value.
+
+Reset local storage when re-testing audit data:
+
+```bash
+rm .fdk/store.sqlite
 fdk run
 ```
 
-Append `?dev=true` to your Freshdesk or Freshservice URL.
+## Key Learnings
 
-### Where to test
-
-1. **Ticket details** → click the **FinSecure shield icon** in the **right sidebar apps** list (Freshservice requires this click; Freshdesk loads it with the conversation)
-2. **Apps menu** (left nav) → **Compliance Center** full page
-3. **New ticket** → change tracker in the new-ticket sidebar
-4. **CTI dialer (Freshdesk only)** → see [Using the CTI dialer](#using-the-cti-dialer-freshdesk-only) below
-
-### Sidebar size
-
-The ticket sidebar height is expanded automatically to **700px** (platform maximum) via `client.instance.resize`. To widen the panel horizontally, drag the divider between the ticket body and the right sidebar in Freshdesk/Freshservice.
-
-### Using the CTI dialer (Freshdesk only)
-
-The dialer is **not** inside the ticket sidebar. It lives in the **CTI global sidebar** — the phone widget at the **bottom-left** of Freshdesk.
-
-1. Run `fdk run` and open Freshdesk with `?dev=true`
-2. Find the **app/phone icon** in the **bottom-left corner** of the screen
-3. **Click the icon** to open the CTI panel (about 400×400px)
-4. Open any ticket and click a **phone number** or **call icon** in Contact details
-5. The number appears in the FinSecure Dialer panel
-
-This is the only placeholder where Freshdesk fires `cti.triggerDialer`.
-
-```sh
-fdk validate
-fdk pack
-```
-
----
-
-## Project structure
-
-```
-.
-├── manifest.json
-├── app/
-│   ├── views/
-│   │   ├── background.html          # Invisible ticket listener
-│   │   ├── ticket-sidebar.html      # Per-ticket dashboard
-│   │   ├── compliance-center.html   # Full-page audit review
-│   │   ├── new-ticket.html          # New-ticket change tracker
-│   │   └── cti.html                 # Freshdesk dialer
-│   └── scripts/
-│       ├── lib/
-│       │   ├── compliance-store.js    # client.db persistence
-│       │   └── compliance-events.js   # Event registration
-│       ├── background.js
-│       ├── ticket-sidebar.js
-│       ├── compliance-center.js
-│       ├── new-ticket.js
-│       └── cti.js
-├── README.md
-└── USECASE.md
-```
-
----
-
-## Tech stack
-
-- **Platform:** Freshworks Platform 3.0
-- **Runtime:** Node.js 24.11.0 · FDK 10.1.2
-- **Storage:** `client.db` key-value (per-ticket logs, guardrails setting, ticket index)
-- **UI:** Crayons v4
-
----
+1. **Surface-specific events** — `cti.triggerDialer` only fires in `cti_global_sidebar`; intercept events require `{ intercept: true }`.
+2. **Background + sidebar split** — put always-on listeners in `ticket_background`; use sidebar for agent-facing review UI.
+3. **Shared storage** — background writes and sidebar reads the same `client.db` keys per ticket ID.
+4. **One registration guard** — `compliance-events.js` uses a `registered` flag so listeners are not attached twice on re-activation.
+5. **Change payload shape** — `event.helper.getData()` returns `{ old, new }` for all `*Changed` ticket events.
 
 ## Resources
 
 - [Events method](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/events-method/)
-- [Data storage](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/db/)
-- [USECASE.md](./USECASE.md)
+- [Key-value storage (`client.db`)](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/db/)
+- [Interface methods — showNotify](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/interface-methods/)
+- [usecase.md](./usecase.md)

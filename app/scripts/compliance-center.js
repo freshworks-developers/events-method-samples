@@ -1,13 +1,24 @@
 (function () {
-  const state = { client: null, selectedId: null };
+  const state = { client: null, selectedId: null, pollTimer: null };
 
   document.addEventListener('DOMContentLoaded', init);
 
   async function init() {
     state.client = await app.initialized();
     document.getElementById('refresh-index').addEventListener('fwClick', loadIndex);
-    state.client.events.on('app.activated', loadIndex);
+    state.client.events.on('app.activated', function () {
+      loadIndex();
+      startPolling();
+    });
     await loadIndex();
+    startPolling();
+  }
+
+  function startPolling() {
+    if (state.pollTimer) {
+      clearInterval(state.pollTimer);
+    }
+    state.pollTimer = setInterval(loadIndex, 3000);
   }
 
   async function loadIndex() {
@@ -23,7 +34,7 @@
       return;
     }
 
-    index.forEach((ticket) => {
+    index.forEach(function (ticket) {
       const row = document.createElement('tr');
       if (ticket.id === state.selectedId) {
         row.classList.add('is-selected');
@@ -34,7 +45,9 @@
         <td>${ticket.blockedCount}</td>
         <td>${formatDate(ticket.updatedAt)}</td>
       `;
-      row.addEventListener('click', () => selectTicket(ticket.id, row));
+      row.addEventListener('click', function () {
+        selectTicket(ticket.id, row);
+      });
       tbody.appendChild(row);
     });
 
@@ -45,7 +58,9 @@
 
   async function selectTicket(ticketId, row) {
     state.selectedId = ticketId;
-    document.querySelectorAll('#ticket-index tr').forEach((tr) => tr.classList.remove('is-selected'));
+    document.querySelectorAll('#ticket-index tr').forEach(function (tr) {
+      tr.classList.remove('is-selected');
+    });
     if (row) {
       row.classList.add('is-selected');
     }
@@ -58,7 +73,7 @@
     const empty = document.getElementById('detail-empty');
     list.innerHTML = '';
 
-    log.forEach((item) => {
+    log.forEach(function (item) {
       const li = document.createElement('li');
       const variantClass =
         item.variant === 'blocked' ? ' fs-list__item--blocked' : item.variant === 'change' ? ' fs-list__item--change' : '';

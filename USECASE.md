@@ -1,64 +1,70 @@
-# Use Cases - FinSecure Bank
+Use Cases - FinSecure Bank / Events Method Samples
+===================================================
 
-**App:** FinSecure Compliance  
-**Repo:** [freshworks-developers/events-method-samples](https://github.com/freshworks-developers/events-method-samples)
+Company Overview
+----------------
 
-## Company Overview
+**FinSecure Bank** is a regulated financial institution using **Freshdesk** for customer disputes and **Freshservice** for internal service requests. Compliance requires an audit trail of agent actions on tickets, guardrails before destructive actions, and CTI integration that reacts when agents click phone numbers — without polling REST APIs or custom browser extensions.
 
-**FinSecure Bank** is a regulated financial institution using **Freshdesk** for customer disputes and **Freshservice** for internal service requests. Compliance requires an **audit trail** of agent actions on tickets, guardrails before destructive actions, and CTI integration that reacts when agents click phone numbers—without polling or custom browser extensions.
+* * * * *
 
-## Use Case Scenarios
+Use Case Scenarios
+------------------
 
-### 1. Agent Action Audit Trail (Click Events)
+### 1\. Agent Action Audit Trail on Every Ticket Page
 
-**Scenario**: Regulators ask for evidence that agents opened reply, forward, note, timer, and navigation actions on dispute tickets. Server-side product events alone miss UI-only clicks.
+**Scenario**: Regulators ask for evidence that agents opened reply, forward, note, timer, and navigation actions on dispute tickets. Server-side product webhooks alone miss UI-only clicks that never reach an API.
 
-**Use Case**: FinSecure Compliance registers click listeners such as `ticket.replyClick`, `ticket.sendReply`, `ticket.forwardClick`, `ticket.addNote`, and `ticket.startTimer`. Each action is logged in the sidebar action log with timestamp and ticket context from `client.data.get('ticket')`.
+**Use Case**: FinSecure Compliance registers 14 click listeners — including `ticket.replyClick`, `ticket.sendReply`, `ticket.addNote`, and `ticket.propertiesUpdated` — in **`ticket_background`**. The background placement runs even when the sidebar is collapsed, so capture never depends on the agent opening the app panel.
 
----
+Each action resolves the active ticket via `client.data.get('ticket')`, appends a timestamped entry to `client.db` under `ticket:{id}:log`, and updates the cross-ticket index for supervisor review.
 
-### 2. Compliance Logging on Field Changes (Change Events)
+**Platform tie-in:** [Events method](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/events-method/) click events + [Data method](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/data-method/) `ticket` + [Key-value storage](https://developers.freshworks.com/docs/app-sdk/v3.0/common/client/db/).
 
-**Scenario**: When priority, status, group, or assignee changes on a fraud case, FinSecure must record old vs new values for SOX reporting.
+* * * * *
 
-**Use Case**: The new-ticket sidebar subscribes to `ticket.priorityChanged`, `ticket.statusChanged`, `ticket.groupChanged`, `ticket.agentChanged`, and `ticket.typeChanged`, using `event.helper.getData()` for `{ old, new }`. The compliance table mirrors what is sent to the audit warehouse.
+### 2\. SOX Field-Change Logging with Old vs New Values
 
----
+**Scenario**: When priority, status, group, assignee, or type changes on a fraud case, FinSecure must record the previous and new values for SOX reporting. Spreadsheet exports from ticket history are too slow for real-time coaching.
 
-### 3. Prevent Accidental Ticket Close or Delete (Intercept Events)
+**Use Case**: `compliance-events.js` subscribes to five change events (`ticket.priorityChanged`, `ticket.statusChanged`, `ticket.groupChanged`, `ticket.agentChanged`, `ticket.typeChanged`). Handlers read `event.helper.getData()` for `{ old, new }`, format human-readable titles like `Priority: High → Urgent`, and persist them with variant `change`.
 
-**Scenario**: Tier-1 agents mistakenly close or delete high-value dispute tickets; recovery takes hours and triggers regulatory notice.
+On the **new-ticket** surface, `new-ticket.js` renders the same events in a live table so agents see routing mistakes before submit. An HR coaching banner appears when group is set to a non-approved queue.
 
-**Use Case**: The app registers `ticket.closeTicketClick` and `ticket.deleteTicketClick` with `{ intercept: true }`. When guardrails are on (default), close and delete are blocked and the agent is notified. Supervisors can disable protection from the Guardrails tab when authorized.
+**Platform tie-in:** Change events and `event.helper.getData()` on ticket details and new-ticket placements.
 
----
+* * * * *
 
-### 4. CTI Click-to-Dial from Ticket Phone Numbers
+### 3\. Prevent Accidental Ticket Close or Delete
 
-**Scenario**: Contact-center agents use Freshdesk CTI; clicking a customer phone number should populate the softphone dialer with the correct E.164 number.
+**Scenario**: Tier-1 agents mistakenly close or delete high-value dispute tickets; recovery takes hours and triggers regulatory notice. FinSecure needs a client-side guardrail that blocks the action before the platform processes it.
 
-**Use Case**: In the CTI global sidebar, `client.events.on('cti.triggerDialer', ...)` reads `event.helper.getData().number` and displays it in the dialer panel with a ready-to-dial status.
+**Use Case**: The app registers `ticket.closeTicketClick` and `ticket.deleteTicketClick` with `{ intercept: true }`. When guardrails are enabled (default), intercept handlers log a **blocked** entry, append to `ticket:{id}:blocked`, and call `client.interface.trigger('showNotify', { type: 'warning', … })` so the agent knows why the action failed.
 
----
+Supervisors can disable protection via the sidebar **fw-toggle**; the setting persists in `settings:guardrails` across sessions.
 
-### 5. Freshservice New-Ticket Workflow Guardrails
+**Platform tie-in:** Intercept option on `client.events.on` + Interface Method `showNotify`.
 
-**Scenario**: Internal IT uses Freshservice for HR and IT requests; HR tickets must not be assigned to the wrong group during creation.
+* * * * *
 
-**Use Case**: The same change-event tracker runs on Freshservice `new_ticket_sidebar`. When `ticket.groupChanged` selects a non-HR queue, a coaching banner warns the agent before submit.
+### 4\. CTI Click-to-Dial from Ticket Phone Numbers
 
----
+**Scenario**: Contact-center agents use Freshdesk CTI. Clicking a customer phone number on a ticket should populate the softphone dialer with the correct E.164 number without copy-paste errors.
 
-## Surfaces
+**Use Case**: The `cti_global_sidebar` placement hosts a minimal dialer panel. `client.events.on('cti.triggerDialer', …)` reads `event.helper.getData().number` and displays it with a **Ready** status label. Agents clear the display with **Clear** when moving to the next call.
 
-| Surface | File |
-|---------|------|
-| Ticket background (always-on) | `app/scripts/background.js` + `lib/compliance-events.js` |
-| Ticket sidebar (per-ticket UI) | `app/scripts/ticket-sidebar.js` |
-| Compliance Center (full page) | `app/scripts/compliance-center.js` |
-| New ticket change tracker | `app/scripts/new-ticket.js` |
-| CTI dialer (Freshdesk only) | `app/scripts/cti.js` |
+This event **cannot** be received from `ticket_sidebar` or `ticket_background` — FinSecure documents that limitation by isolating CTI logic in `cti.html` rather than the ticket compliance dashboard.
 
-```sh
-fdk run
-```
+**Platform tie-in:** `cti.triggerDialer` event — Freshdesk CTI global sidebar only.
+
+* * * * *
+
+### 5\. Cross-Ticket Supervisor Review in Compliance Center
+
+**Scenario**: Compliance officers need a consolidated view of agent activity across tickets, not one ticket at a time in the sidebar. Monthly audits sample dozens of dispute tickets for anomalous close/delete attempts.
+
+**Use Case**: The **Compliance Center** full-page app reads `audit:ticket-index` from `client.db` — up to 100 tickets with event and blocked counts. Supervisors click a row to drill into the full `ticket:{id}:log` for that ticket, mirroring what agents see in the sidebar but across the entire portfolio.
+
+Background capture continuously feeds the index; no export job or REST polling is required during the business day.
+
+**Platform tie-in:** `common.full_page_app` + shared `client.db` keys written by `ticket_background`.

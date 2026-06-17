@@ -1,8 +1,9 @@
-/* Shared persistence for FinSecure Compliance (client.db + in-memory dev fallback) */
+/* Shared persistence for FinSecure Compliance (client.db + local dev mirror) */
 window.FinSecureStore = (function () {
   const GUARDRAILS_KEY = 'settings:guardrails';
   const TICKET_INDEX_KEY = 'audit:ticket-index';
-  const memory = new Map();
+  const EVENTS_LOCK_KEY = 'settings:events-registered';
+  const DEV_STORAGE_PREFIX = 'finsecure-compliance:';
 
   function ticketLogKey(ticketId) {
     return `ticket:${ticketId}:log`;
@@ -16,34 +17,78 @@ window.FinSecureStore = (function () {
     return err && (err.status === 0 || err.status === '0');
   }
 
+  function canUseLocalStorage() {
+    try {
+      const probe = '__finsecure_probe__';
+      localStorage.setItem(probe, '1');
+      localStorage.removeItem(probe);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function devStorageGet(key) {
+    if (!canUseLocalStorage()) {
+      return null;
+    }
+    try {
+      const raw = localStorage.getItem(DEV_STORAGE_PREFIX + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.info('Dev storage read failed', error);
+      return null;
+    }
+  }
+
+  function devStorageSet(key, value) {
+    if (!canUseLocalStorage()) {
+      return;
+    }
+    try {
+      localStorage.setItem(DEV_STORAGE_PREFIX + key, JSON.stringify(value));
+    } catch (error) {
+      console.info('Dev storage write failed', error);
+    }
+  }
+
+  function devStorageDelete(key) {
+    if (!canUseLocalStorage()) {
+      return;
+    }
+    try {
+      localStorage.removeItem(DEV_STORAGE_PREFIX + key);
+    } catch (error) {
+      console.info('Dev storage delete failed', error);
+    }
+  }
+
   async function dbGet(client, key) {
     try {
-      return await client.db.get(key);
+      const value = await client.db.get(key);
+      if (value !== undefined && value !== null) {
+        return value;
+      }
     } catch (err) {
       if (err.status === 404) {
-        return null;
+        return devStorageGet(key);
       }
-      if (isDevDbError(err) && memory.has(key)) {
-        return memory.get(key);
+      if (!isDevDbError(err)) {
+        throw err;
       }
-      if (isDevDbError(err)) {
-        return null;
-      }
-      throw err;
     }
+    return devStorageGet(key);
   }
 
   async function dbSet(client, key, value) {
     try {
       await client.db.set(key, value);
     } catch (err) {
-      if (isDevDbError(err)) {
-        memory.set(key, value);
-        return;
+      if (!isDevDbError(err)) {
+        throw err;
       }
-      throw err;
     }
-    memory.set(key, value);
+    devStorageSet(key, value);
   }
 
   async function dbDelete(client, key) {
@@ -54,7 +99,24 @@ window.FinSecureStore = (function () {
         throw err;
       }
     }
-    memory.delete(key);
+    devStorageDelete(key);
+  }
+
+  async function acquireEventRegistration(client) {
+    try {
+      await client.db.set(EVENTS_LOCK_KEY, { registered: true }, { setIf: 'not_exist' });
+      return true;
+    } catch (err) {
+      if (err.status === 409) {
+        return false;
+      }
+      const existing = await dbGet(client, EVENTS_LOCK_KEY);
+      if (existing && existing.registered) {
+        return false;
+      }
+      await dbSet(client, EVENTS_LOCK_KEY, { registered: true });
+      return true;
+    }
   }
 
   async function getGuardrailsEnabled(client) {
@@ -106,11 +168,13 @@ window.FinSecureStore = (function () {
   async function trackTicket(client, ticketId) {
     const id = String(ticketId);
     const index = await getTicketIndex(client);
-    const existing = index.find((row) => row.id === id);
+    const existing = index.find(function (row) {
+      return row.id === id;
+    });
     const log = await getLog(client, id);
     const blocked = await getBlocked(client, id);
     const row = {
-      id,
+      id: id,
       eventCount: log.length,
       blockedCount: blocked.length,
       updatedAt: new Date().toISOString()
@@ -131,13 +195,14 @@ window.FinSecureStore = (function () {
   }
 
   return {
-    getGuardrailsEnabled,
-    setGuardrailsEnabled,
-    appendLogEntry,
-    appendBlockedEntry,
-    getLog,
-    getBlocked,
-    clearLog,
-    getTicketIndex
+    acquireEventRegistration: acquireEventRegistration,
+    getGuardrailsEnabled: getGuardrailsEnabled,
+    setGuardrailsEnabled: setGuardrailsEnabled,
+    appendLogEntry: appendLogEntry,
+    appendBlockedEntry: appendBlockedEntry,
+    getLog: getLog,
+    getBlocked: getBlocked,
+    clearLog: clearLog,
+    getTicketIndex: getTicketIndex
   };
 })();
